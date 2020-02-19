@@ -11,7 +11,17 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    if !session.has_key? :ratings
+      session[:ratings] = Movie.all_ratings
+    end
+    @movies =movie.order(params[:sort_by])
+    @all_ratings= Movie.all_ratings
+    @hilite= params[:sort_by] || 'none'
+    
+    if params.has_key? :ratings and !params[:ratings].nil? and params[:ratings].keys.length > 0
+       @movies = @movies.where(rating: params[:ratings].keys)
+       session[:ratings]=params[:ratings].keys
+    end
   end
 
   def new
